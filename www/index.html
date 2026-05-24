@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Victron VRM Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="app">
+
+    <header class="heroTop glass headerSlim">
+        <div class="headerLogoWrap">
+            <img
+                id="headerLogo"
+                class="headerLogo"
+                src="/0_userdata.0/victron-logo.png"
+                alt="Dashboard Logo"
+                onerror="this.style.display='none';"
+            />
+        </div>
+
+        <div class="heroStats">
+            <div class="statPill">
+                <span>📅</span>
+                <span id="dateTime">-</span>
+            </div>
+            <div class="statPill">
+                <span>🌡️</span>
+                <span id="temperature">0,0 °C</span>
+            </div>
+            <div class="statPill">
+                <span>☀️</span>
+                <span id="pvTodayTop">PV heute 0,0 kWh</span>
+            </div>
+            <div class="statPill">
+                <span>💡</span>
+                <span id="lux">0 Lux</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero glass">
+        <div id="houseImage" class="houseImage"></div>
+        <div class="heroOverlay"></div>
+
+        <div class="pvCluster">
+            <div class="pvWideNode">
+                <div class="pvWideTitle">PV Gesamtleistung</div>
+                <div id="pvTotal" class="pvWideValue">0 W</div>
+
+                <div id="pvStringsGrid" class="pvStringsGrid"></div>
+            </div>
+        </div>
+
+        <div class="flowArea">
+            <div class="node grid">
+                <div class="nodeLabel">
+                    <div class="mastIcon" aria-hidden="true">
+                        <span class="mastStem"></span>
+                        <span class="mastArm mastArmLeft"></span>
+                        <span class="mastArm mastArmRight"></span>
+                        <span class="mastLeg mastLegLeft"></span>
+                        <span class="mastLeg mastLegRight"></span>
+                    </div>
+                    <span class="nodeLabelText">Netz</span>
+                </div>
+
+                <div id="gridNet" class="nodeValue">0 W</div>
+                <div id="gridDirection" class="nodeSub gridSingle">0 W</div>
+            </div>
+
+            <div class="batteryCard glass">
+                <div class="line left" id="lineGrid"></div>
+                <div class="line right activeHouse" id="lineHouse"></div>
+                <div class="line top" id="pvFlowTop"></div>
+
+                <div class="ringWrap">
+                    <svg viewBox="0 0 120 120" aria-hidden="true">
+                        <circle class="ringBg" cx="60" cy="60" r="50"></circle>
+                        <circle id="batteryRing" class="ringFg" cx="60" cy="60" r="50"></circle>
+                    </svg>
+
+                    <div class="ringText">
+                        <div id="batterySoc" class="soc">0%</div>
+                        <div id="batteryPower" class="power">0 W</div>
+                    </div>
+                </div>
+
+                <div class="batteryGrid">
+                    <div>
+                        <span>Spannung</span>
+                        <strong id="batteryVoltage">0,0 V</strong>
+                    </div>
+                    <div>
+                        <span>Strom</span>
+                        <strong id="batteryCurrent">0,0 A</strong>
+                    </div>
+                    <div>
+                        <span>Temp</span>
+                        <strong id="batteryTemperature">0,0 °C</strong>
+                    </div>
+                    <div>
+                        <span>Restzeit</span>
+                        <strong id="batteryTimeRemaining">-</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="node house">
+                <div class="nodeLabel">
+                    <div class="houseIcon" aria-hidden="true">
+                        <span class="houseRoof"></span>
+                        <span class="houseBody"></span>
+                    </div>
+                    <span class="nodeLabelText">Haus</span>
+                </div>
+
+                <div id="housePower" class="nodeValue">0 W</div>
+                <div id="houseConsumers" class="nodeSub houseConsumers">Keine Verbraucher aktiv</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cards4" id="dynamicCards"></section>
+
+    <section class="consumers glass">
+        <div class="consumersHeader">
+            <h2>Verbraucher</h2>
+            <span id="consumerCount">0 aktiv</span>
+        </div>
+        <div id="consumersGrid" class="consumersGrid"></div>
+    </section>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

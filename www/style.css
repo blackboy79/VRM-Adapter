@@ -1,0 +1,801 @@
+:root {
+  --glass: rgba(5, 19, 42, 0.72);
+  --line: rgba(255, 255, 255, 0.08);
+  --text: #eef4ff;
+  --muted: #a8bad1;
+  --pv: #ffd43b;
+  --grid: #ff6b6b;
+  --house: #4dabf7;
+  --bat: #51cf66;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top right, rgba(22, 69, 130, 0.45), transparent 32%),
+    linear-gradient(180deg, #020b19 0%, #04162e 55%, #030d1b 100%);
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.app {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 10px 14px 14px;
+}
+
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* HEADER */
+.heroTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.headerSlim {
+  padding: 8px 16px;
+  min-height: 62px;
+}
+
+.headerLogoWrap {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+}
+
+.headerLogo {
+  display: block;
+  max-height: 34px;
+  max-width: 240px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(80, 180, 255, 0.2));
+}
+
+.heroStats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.statPill {
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(5, 20, 44, 0.82);
+  border: 1px solid var(--line);
+  font-size: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* HERO */
+.hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 610px;
+  padding: 14px 16px 16px;
+  margin-bottom: 10px;
+}
+
+.houseImage {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(2, 10, 22, 0.22), rgba(2, 10, 22, 0.50));
+  background-size: cover;
+  background-position: center;
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center top, rgba(50, 112, 200, 0.14), transparent 40%);
+}
+
+/* PV BLOCK */
+.pvCluster {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.pvWideNode {
+  width: min(820px, 80%);
+  min-height: 88px;
+  border-radius: 20px;
+  padding: 8px 14px 10px;
+  border: 2px solid rgba(255, 212, 59, 0.85);
+  background: rgba(3, 14, 30, 0.60);
+  backdrop-filter: blur(4px);
+  text-align: center;
+}
+
+.pvWideTitle {
+  font-size: 15px;
+  color: #d9e5f9;
+  margin-bottom: 3px;
+}
+
+.pvWideValue {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.pvStringsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
+  gap: 8px 10px;
+}
+
+.pvStringItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pvStringName {
+  font-size: 14px;
+  color: #d9e5f9;
+  text-align: left;
+}
+
+.pvStringValue {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* FLOW AREA */
+.flowArea {
+  position: relative;
+  z-index: 3;
+  margin-top: 102px;
+  display: grid;
+  grid-template-columns: 220px 1fr 220px;
+  gap: 24px;
+  align-items: center;
+  min-height: 280px;
+}
+
+.node {
+  position: relative;
+  z-index: 4;
+  text-align: center;
+  background: rgba(3, 14, 30, 0.64);
+  backdrop-filter: blur(3px);
+  min-height: 132px;
+  border-radius: 24px;
+  padding: 16px;
+  border: 2px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.node.grid {
+  border-color: rgba(255, 107, 107, 0.85);
+}
+
+.node.house {
+  border-color: rgba(77, 171, 247, 0.85);
+}
+
+.nodeLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-bottom: 8px;
+}
+
+.nodeLabelText {
+  font-size: 17px;
+  color: #d9e5f9;
+}
+
+.nodeValue {
+  font-size: 52px;
+  font-weight: 700;
+  margin: 4px 0;
+}
+
+.nodeSub {
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.gridSingle.red {
+  color: #ff8787;
+}
+
+.gridSingle.green {
+  color: #74f08e;
+}
+
+.houseConsumers {
+  font-size: 14px;
+  line-height: 1.28;
+  color: #b9cbe1;
+  margin-top: 8px;
+  min-height: 56px;
+}
+
+/* Strommast Icon */
+.mastIcon {
+  position: relative;
+  width: 24px;
+  height: 30px;
+  display: inline-block;
+}
+
+.mastStem,
+.mastArm,
+.mastLeg {
+  position: absolute;
+  display: block;
+  background: #d9e5f9;
+  border-radius: 999px;
+}
+
+.mastStem {
+  left: 11px;
+  top: 2px;
+  width: 2px;
+  height: 20px;
+}
+
+.mastArm {
+  top: 8px;
+  width: 11px;
+  height: 2px;
+}
+
+.mastArmLeft {
+  left: 1px;
+  transform: rotate(-12deg);
+}
+
+.mastArmRight {
+  right: 1px;
+  transform: rotate(12deg);
+}
+
+.mastLeg {
+  bottom: 2px;
+  width: 2px;
+  height: 10px;
+}
+
+.mastLegLeft {
+  left: 7px;
+  transform: rotate(22deg);
+}
+
+.mastLegRight {
+  right: 7px;
+  transform: rotate(-22deg);
+}
+
+/* Haus Icon */
+.houseIcon {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+}
+
+.houseRoof {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-top: 2px solid #d9e5f9;
+  border-left: 2px solid #d9e5f9;
+  transform: rotate(45deg);
+}
+
+.houseBody {
+  position: absolute;
+  left: 6px;
+  bottom: 2px;
+  width: 12px;
+  height: 10px;
+  border: 2px solid #d9e5f9;
+  border-top: none;
+  border-radius: 0 0 2px 2px;
+}
+
+/* BATTERY */
+.batteryCard {
+  position: relative;
+  z-index: 5;
+  justify-self: center;
+  width: 330px;
+  padding: 16px 18px 14px;
+  border: 2px solid rgba(81, 207, 102, 0.62);
+  background: rgba(3, 14, 30, 0.45);
+}
+
+.ringWrap {
+  position: relative;
+  width: 190px;
+  height: 190px;
+  margin: 0 auto;
+}
+
+.ringWrap svg {
+  width: 190px;
+  height: 190px;
+  transform: rotate(-90deg);
+}
+
+.ringBg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 8;
+}
+
+.ringFg {
+  fill: none;
+  stroke: var(--bat);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 314;
+  stroke-dashoffset: 314;
+}
+
+.ringText {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.soc {
+  font-size: 48px;
+  font-weight: 700;
+}
+
+.power {
+  font-size: 22px;
+  color: #b9ffbf;
+  margin-top: 4px;
+}
+
+.batteryGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.batteryGrid div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.batteryGrid span {
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.batteryGrid strong {
+  font-size: 18px;
+  margin-top: 3px;
+}
+
+/* FLOW LINES */
+.line {
+  position: absolute;
+  border-radius: 999px;
+  opacity: 0.98;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.line.left {
+  top: 50%;
+  right: calc(100% + 8px);
+  transform: translateY(-50%);
+  width: 150px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.line.right {
+  top: 50%;
+  left: calc(100% + 8px);
+  transform: translateY(-50%);
+  width: 150px;
+  height: 4px;
+  background: rgba(81, 207, 102, 0.95);
+  box-shadow: 0 0 10px rgba(81, 207, 102, 0.25);
+}
+
+.line.right.activeHouse {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(81, 207, 102, 0.98) 0 18px,
+      rgba(81, 207, 102, 0.18) 18px 32px
+    );
+  background-size: 48px 100%;
+  animation: flowRight 1s linear infinite;
+}
+
+.line.top {
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  width: 4px;
+  height: 96px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 212, 59, 0.20) 0%,
+      rgba(81, 207, 102, 0.14) 100%
+    );
+  overflow: hidden;
+}
+
+.line.top.active {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 212, 59, 0.98) 0 16px,
+      rgba(81, 207, 102, 0.98) 16px 32px
+    );
+  background-size: 100% 46px;
+  animation: pvFlowDown 1s linear infinite;
+  box-shadow: 0 0 12px rgba(255, 212, 59, 0.35);
+}
+
+.line.left.import {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 107, 107, 0.98) 0 18px,
+      rgba(255, 107, 107, 0.18) 18px 32px
+    );
+  background-size: 48px 100%;
+  animation: flowRight 1s linear infinite;
+  box-shadow: 0 0 12px rgba(255, 107, 107, 0.28);
+}
+
+.line.left.export {
+  background:
+    repeating-linear-gradient(
+      270deg,
+      rgba(81, 207, 102, 0.98) 0 18px,
+      rgba(81, 207, 102, 0.18) 18px 32px
+    );
+  background-size: 48px 100%;
+  animation: flowLeft 1s linear infinite;
+  box-shadow: 0 0 12px rgba(81, 207, 102, 0.28);
+}
+
+@keyframes flowRight {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 48px 0;
+  }
+}
+
+@keyframes flowLeft {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -48px 0;
+  }
+}
+
+@keyframes pvFlowDown {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 46px;
+  }
+}
+
+/* LOWER CARDS */
+.cards4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.card {
+  padding: 16px;
+}
+
+.cardTitle {
+  font-size: 18px;
+  color: #cdd9ec;
+}
+
+.cardValue {
+  font-size: 42px;
+  font-weight: 700;
+  margin: 10px 0;
+}
+
+.cardSub {
+  font-size: 16px;
+  color: var(--muted);
+}
+
+/* CONSUMERS */
+.consumers {
+  padding: 16px;
+}
+
+.consumersHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.consumersHeader h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.consumersHeader span {
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.consumersGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.consumer {
+  padding: 16px;
+  min-height: 155px;
+  border-radius: 22px;
+  background: rgba(3, 14, 30, 0.62);
+  border: 1px solid var(--line);
+}
+
+.consumer .icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.consumer .name {
+  font-size: 18px;
+  margin-top: 6px;
+}
+
+.consumer .power {
+  font-size: 34px;
+  font-weight: 700;
+  margin: 12px 0 8px;
+}
+
+.consumer .today,
+.consumer .yesterday {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1400px) {
+  .pvWideValue {
+    font-size: 36px;
+  }
+
+  .pvStringsGrid {
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
+  }
+
+  .consumersGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1200px) {
+  .flowArea {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 56px;
+    min-height: auto;
+  }
+
+  .line {
+    display: none;
+  }
+
+  .cards4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .consumersGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hero {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .app {
+    padding: 8px;
+  }
+
+  .headerSlim {
+    padding: 8px 10px;
+  }
+
+  .heroStats {
+    gap: 6px;
+  }
+
+  .statPill {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .headerLogo {
+    max-height: 28px;
+    max-width: 180px;
+  }
+
+  .pvWideNode {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .pvWideValue {
+    font-size: 32px;
+  }
+
+  .pvStringsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .cards4 {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  .cardValue {
+    font-size: 32px;
+  }
+
+  .cardSub {
+    font-size: 14px;
+  }
+
+  .batteryCard {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .ringWrap {
+    width: 170px;
+    height: 170px;
+  }
+
+  .ringWrap svg {
+    width: 170px;
+    height: 170px;
+  }
+
+  .soc {
+    font-size: 38px;
+  }
+
+  .power {
+    font-size: 18px;
+  }
+
+  .nodeValue {
+    font-size: 40px;
+  }
+
+  .houseConsumers {
+    font-size: 13px;
+  }
+
+  .consumersGrid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .consumer {
+    min-height: 128px;
+    padding: 12px;
+  }
+
+  .consumer .power {
+    font-size: 28px;
+    margin: 8px 0 6px;
+  }
+}
+
+@media (max-width: 600px) and (orientation: portrait) {
+  .hero {
+    padding: 10px;
+  }
+
+  .cards4 {
+    grid-template-columns: 1fr;
+  }
+
+  .statPill {
+    font-size: 12px;
+    padding: 7px 9px;
+  }
+
+  .pvWideTitle {
+    font-size: 13px;
+  }
+
+  .pvWideValue {
+    font-size: 28px;
+  }
+
+  .node {
+    min-height: 118px;
+    padding: 12px;
+  }
+
+  .nodeValue {
+    font-size: 34px;
+  }
+
+  .consumers {
+    padding: 12px;
+  }
+}

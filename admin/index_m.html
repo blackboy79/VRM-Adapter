@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Victron VRM Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
+    <link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css"/>
+    <script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="../../js/translate.js"></script>
+    <script type="text/javascript" src="../../lib/js/materialize.js"></script>
+    <script type="text/javascript" src="../../js/adapter-settings.js"></script>
+    <style>
+        .adapter-container { padding: 18px; }
+        .block { border: 1px solid #ddd; border-radius: 12px; padding: 16px; margin-bottom: 18px; }
+        .consumer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .pick-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+        .pick-btn { margin-bottom: 20px; }
+        .modal-body { max-height: 65vh; overflow: auto; }
+        .object-item { padding: 8px 10px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .object-item:hover { background: #f5f5f5; }
+        .small-note { color: #777; font-size: .9rem; }
+        .check-row { margin: 8px 0 14px 0; }
+        .check-row label { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+        .check-row input[type="checkbox"] { position: static !important; opacity: 1 !important; pointer-events: auto !important; width: 18px !important; height: 18px !important; margin: 0 !important; accent-color: #2196f3; }
+        .check-row span { position: static !important; padding-left: 0 !important; color: #666; }
+        .check-row span::before, .check-row span::after { display: none !important; content: none !important; }
+    </style>
+</head>
+
+<body>
+<div class="m adapter-container">
+    <div class="row">
+        <div class="col s12">
+            <h4>Victron VRM Dashboard</h4>
+            <p class="small-note">Klassische Konfiguration mit Datenpunkt-Auswahl per Popup.</p>
+        </div>
+    </div>
+
+    <div class="block">
+        <h5>Verbindung & Darstellung</h5>
+        <div class="row">
+            <div class="input-field col s12 m6">
+                <input class="value" id="accessToken" type="password">
+                <label for="accessToken">VRM Access Token</label>
+            </div>
+            <div class="input-field col s12 m3">
+                <input class="value" id="siteId" type="text">
+                <label for="siteId">VRM Site ID</label>
+            </div>
+            <div class="input-field col s12 m3">
+                <input class="value" id="pollIntervalSeconds" type="number" min="10">
+                <label for="pollIntervalSeconds">Polling-Intervall (Sek.)</label>
+            </div>
+
+            <div class="input-field col s12 m6">
+                <input class="value" id="dashboardTitle" type="text">
+                <label for="dashboardTitle">Dashboard Titel</label>
+            </div>
+            <div class="input-field col s12 m6">
+                <input class="value" id="dashboardSubtitle" type="text">
+                <label for="dashboardSubtitle">Dashboard Untertitel</label>
+            </div>
+
+            <div class="input-field col s12 m6">
+                <input class="value" id="dayImageUrl" type="text">
+                <label for="dayImageUrl">Tagbild URL/Pfad (PNG/JPG)</label>
+            </div>
+            <div class="input-field col s12 m6">
+                <input class="value" id="nightImageUrl" type="text">
+                <label for="nightImageUrl">Nachtbild URL/Pfad (PNG/JPG)</label>
+            </div>
+
+            <div class="input-field col s12 m4">
+                <select class="value" id="imageMode">
+                    <option value="auto">Auto</option>
+                    <option value="day">Tag erzwingen</option>
+                    <option value="night">Nacht erzwingen</option>
+                </select>
+                <label for="imageMode">Bildmodus</label>
+            </div>
+
+            <div class="col s12 m4" style="margin-top:20px;">
+                <div class="check-row">
+                    <label for="showVictronLogo">
+                        <input class="value" id="showVictronLogo" type="checkbox">
+                        <span>Victron Blue Power Logo anzeigen</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="col s12 m4" style="margin-top:20px;">
+                <div class="check-row">
+                    <label for="compactMode">
+                        <input class="value" id="compactMode" type="checkbox">
+                        <span>Kompaktmodus aktiv</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="block">
+        <h5>Manuelle Datenquellen (leer = VRM-Auto benutzen)</h5>
+        <div class="row">
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_pvRoof" type="text"><label for="manual_pvRoof">PV Dach Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_pvRoof">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_pvFacade" type="text"><label for="manual_pvFacade">PV Fassade Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_pvFacade">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_pvGarden" type="text"><label for="manual_pvGarden">PV Gartenhaus Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_pvGarden">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_pvToday" type="text"><label for="manual_pvToday">PV Heute (kWh) Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_pvToday">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_pvNow" type="text"><label for="manual_pvNow">PV Gesamt Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_pvNow">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_housePower" type="text"><label for="manual_housePower">Hausleistung Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_housePower">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_houseToday" type="text"><label for="manual_houseToday">Haus Tagesverbrauch Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_houseToday">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_gridImportPower" type="text"><label for="manual_gridImportPower">Netzbezug Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_gridImportPower">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_gridExportPower" type="text"><label for="manual_gridExportPower">Netzeinspeisung Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_gridExportPower">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_gridNetPower" type="text"><label for="manual_gridNetPower">Netz Netto Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_gridNetPower">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_batterySoc" type="text"><label for="manual_batterySoc">Batterie SOC Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_batterySoc">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_batteryPower" type="text"><label for="manual_batteryPower">Batterie Leistung Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_batteryPower">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_batteryVoltage" type="text"><label for="manual_batteryVoltage">Batterie Spannung Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_batteryVoltage">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_batteryCurrent" type="text"><label for="manual_batteryCurrent">Batterie Strom Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_batteryCurrent">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_batteryTemperature" type="text"><label for="manual_batteryTemperature">Batterie Temperatur Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_batteryTemperature">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_batteryTimeRemaining" type="text"><label for="manual_batteryTimeRemaining">Batterie Restzeit Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_batteryTimeRemaining">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_heatpumpPower" type="text"><label for="manual_heatpumpPower">Wärmepumpe Leistung Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_heatpumpPower">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_heatpumpToday" type="text"><label for="manual_heatpumpToday">Wärmepumpe Heute (kWh) Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_heatpumpToday">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_temperatureOutdoor" type="text"><label for="manual_temperatureOutdoor">Außentemperatur Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_temperatureOutdoor">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_lux" type="text"><label for="manual_lux">Lux Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_lux">Auswählen</a></div></div>
+            <div class="col s12 m6"><div class="pick-row"><div class="input-field"><input class="value" id="manual_dateTime" type="text"><label for="manual_dateTime">Datum/Uhrzeit Datenpunkt</label></div><a class="btn pick-btn blue darken-2" data-target-input="manual_dateTime">Auswählen</a></div></div>
+        </div>
+    </div>
+
+    <div class="block">
+        <h5>PV Strings</h5>
+        <p class="small-note">Bis zu 10 Strings, frei benennbar und mit Leistung/Heute-Datenpunkt.</p>
+        <div class="consumer-grid" id="pvStringsContainer"></div>
+    </div>
+
+    <div class="block">
+        <h5>Verbraucher unter Haus / Bezug</h5>
+        <div class="consumer-grid" id="consumersContainer"></div>
+    </div>
+
+    <div class="block">
+        <h5>Untere 4 Blasen frei konfigurieren</h5>
+        <p class="small-note">Jede Karte hat Titel, Hauptwert und bis zu 4 frei definierbare Zeilen.</p>
+        <div class="consumer-grid" id="cardsContainer"></div>
+    </div>
+
+    <div class="modal" id="pickerModal">
+        <div class="modal-content">
+            <h5>Datenpunkt auswählen</h5>
+            <div class="input-field">
+                <input id="pickerSearch" type="text">
+                <label for="pickerSearch">Suche</label>
+            </div>
+            <div class="modal-body" id="pickerList"></div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect btn-flat">Schließen</a>
+        </div>
+    </div>
+</div>
+
+<script>
+let _objects = [];
+let _targetInput = null;
+
+function buildPicker(filter = "") {
+    const q = (filter || "").toLowerCase();
+    const list = _objects
+        .filter(o => o.type === "state")
+        .filter(o => !q || o._id.toLowerCase().includes(q))
+        .slice(0, 1200);
+
+    document.getElementById("pickerList").innerHTML =
+        list.map(o => `<div class="object-item" data-id="${o._id}">${o._id}</div>`).join("") ||
+        "<div>Keine Treffer</div>";
+
+    $(".object-item").off("click").on("click", function () {
+        const id = $(this).data("id");
+        if (_targetInput) {
+            $("#" + _targetInput).val(id).trigger("change");
+            M.updateTextFields();
+        }
+        M.Modal.getInstance(document.getElementById("pickerModal")).close();
+    });
+}
+
+function renderPvStrings() {
+    const root = document.getElementById("pvStringsContainer");
+    let html = "";
+
+    for (let i = 1; i <= 10; i++) {
+        html += `
+            <div class="block">
+                <h6>PV String ${i}</h6>
+                <div class="check-row">
+                    <label for="pvString${i}Enabled">
+                        <input class="value" id="pvString${i}Enabled" type="checkbox">
+                        <span>Aktiv</span>
+                    </label>
+                </div>
+                <div class="input-field">
+                    <input class="value" id="pvString${i}Name" type="text">
+                    <label for="pvString${i}Name">Name</label>
+                </div>
+                <div class="pick-row">
+                    <div class="input-field">
+                        <input class="value" id="pvString${i}Power" type="text">
+                        <label for="pvString${i}Power">Leistung Datenpunkt</label>
+                    </div>
+                    <a class="btn pick-btn blue darken-2" data-target-input="pvString${i}Power">Auswählen</a>
+                </div>
+                <div class="pick-row">
+                    <div class="input-field">
+                        <input class="value" id="pvString${i}Today" type="text">
+                        <label for="pvString${i}Today">Heute (kWh) Datenpunkt</label>
+                    </div>
+                    <a class="btn pick-btn blue darken-2" data-target-input="pvString${i}Today">Auswählen</a>
+                </div>
+            </div>
+        `;
+    }
+
+    root.innerHTML = html;
+}
+
+function renderConsumers() {
+    const root = document.getElementById("consumersContainer");
+    let html = "";
+
+    for (let i = 1; i <= 10; i++) {
+        html += `
+            <div class="block">
+                <h6>Verbraucher ${i}</h6>
+                <div class="check-row">
+                    <label for="consumer${i}Enabled">
+                        <input class="value" id="consumer${i}Enabled" type="checkbox">
+                        <span>Aktiv</span>
+                    </label>
+                </div>
+                <div class="input-field">
+                    <input class="value" id="consumer${i}Name" type="text">
+                    <label for="consumer${i}Name">Name</label>
+                </div>
+                <div class="input-field">
+                    <input class="value" id="consumer${i}Icon" type="text">
+                    <label for="consumer${i}Icon">Icon</label>
+                </div>
+                <div class="input-field">
+                    <input class="value" id="consumer${i}Color" type="text">
+                    <label for="consumer${i}Color">Farbe</label>
+                </div>
+                <div class="pick-row">
+                    <div class="input-field">
+                        <input class="value" id="consumer${i}Power" type="text">
+                        <label for="consumer${i}Power">Leistung Datenpunkt</label>
+                    </div>
+                    <a class="btn pick-btn blue darken-2" data-target-input="consumer${i}Power">Auswählen</a>
+                </div>
+                <div class="pick-row">
+                    <div class="input-field">
+                        <input class="value" id="consumer${i}Today" type="text">
+                        <label for="consumer${i}Today">Heute (kWh) Datenpunkt</label>
+                    </div>
+                    <a class="btn pick-btn blue darken-2" data-target-input="consumer${i}Today">Auswählen</a>
+                </div>
+                <div class="pick-row">
+                    <div class="input-field">
+                        <input class="value" id="consumer${i}Yesterday" type="text">
+                        <label for="consumer${i}Yesterday">Gestern (kWh) Datenpunkt</label>
+                    </div>
+                    <a class="btn pick-btn blue darken-2" data-target-input="consumer${i}Yesterday">Auswählen</a>
+                </div>
+            </div>
+        `;
+    }
+
+    root.innerHTML = html;
+}
+
+function renderCards() {
+    const root = document.getElementById("cardsContainer");
+    let html = "";
+
+    for (let c = 1; c <= 4; c++) {
+        html += `
+            <div class="block">
+                <h6>Karte ${c}</h6>
+
+                <div class="input-field">
+                    <input class="value" id="card${c}Title" type="text">
+                    <label for="card${c}Title">Titel</label>
+                </div>
+
+                <div class="input-field">
+                    <input class="value" id="card${c}MainLabel" type="text">
+                    <label for="card${c}MainLabel">Hauptwert Label</label>
+                </div>
+
+                <div class="pick-row">
+                    <div class="input-field">
+                        <input class="value" id="card${c}MainDp" type="text">
+                        <label for="card${c}MainDp">Hauptwert Datenpunkt</label>
+                    </div>
+                    <a class="btn pick-btn blue darken-2" data-target-input="card${c}MainDp">Auswählen</a>
+                </div>
+
+                <div class="input-field">
+                    <input class="value" id="card${c}MainUnit" type="text">
+                    <label for="card${c}MainUnit">Hauptwert Einheit</label>
+                </div>
+        `;
+
+        for (let r = 1; r <= 4; r++) {
+            html += `
+                <div class="block" style="margin-top:12px;">
+                    <h6>Zeile ${r}</h6>
+
+                    <div class="input-field">
+                        <input class="value" id="card${c}Row${r}Label" type="text">
+                        <label for="card${c}Row${r}Label">Zeilentext</label>
+                    </div>
+
+                    <div class="pick-row">
+                        <div class="input-field">
+                            <input class="value" id="card${c}Row${r}Dp" type="text">
+                            <label for="card${c}Row${r}Dp">Datenpunkt</label>
+                        </div>
+                        <a class="btn pick-btn blue darken-2" data-target-input="card${c}Row${r}Dp">Auswählen</a>
+                    </div>
+
+                    <div class="input-field">
+                        <input class="value" id="card${c}Row${r}Unit" type="text">
+                        <label for="card${c}Row${r}Unit">Einheit</label>
+                    </div>
+                </div>
+            `;
+        }
+
+        html += `</div>`;
+    }
+
+    root.innerHTML = html;
+}
+
+function load(settings, onChange) {
+    if (!settings) return;
+
+    renderPvStrings();
+    renderConsumers();
+    renderCards();
+
+    $(".value").each(function () {
+        const id = $(this).attr("id");
+        const type = $(this).attr("type");
+
+        if (type === "checkbox") {
+            $(this).prop("checked", !!settings[id]);
+        } else {
+            $(this).val(settings[id] !== undefined ? settings[id] : "");
+        }
+
+        $(this).on("change input", function () {
+            onChange();
+        });
+    });
+
+    $(".check-row label").off("click").on("click", function (e) {
+        const input = $(this).find("input[type='checkbox']");
+        if (input.length && e.target.tagName.toLowerCase() !== "input") {
+            input.prop("checked", !input.prop("checked")).trigger("change");
+            e.preventDefault();
+        }
+    });
+
+    M.FormSelect.init(document.querySelectorAll("select"));
+    M.Modal.init(document.querySelectorAll(".modal"));
+
+    socket.emit("getObjects", function (err, res) {
+        if (!err && res) {
+            _objects = Object.keys(res).map(k => Object.assign({ _id: k }, res[k] || {}));
+            buildPicker("");
+        }
+    });
+
+    $("#pickerSearch").on("input", function () {
+        buildPicker($(this).val());
+    });
+
+    $(document).off("click.pickbtn").on("click.pickbtn", ".pick-btn", function () {
+        _targetInput = $(this).data("target-input");
+        $("#pickerSearch").val("");
+        buildPicker("");
+        M.Modal.getInstance(document.getElementById("pickerModal")).open();
+    });
+
+    onChange(false);
+    M.updateTextFields();
+  }
+
+function save(callback) {
+    const obj = {};
+
+    $(".value").each(function () {
+        const id = $(this).attr("id");
+        const type = $(this).attr("type");
+
+        if (type === "checkbox") {
+            obj[id] = $(this).prop("checked");
+        } else if (type === "number") {
+            obj[id] = parseInt($(this).val(), 10) || 0;
+        } else {
+            obj[id] = $(this).val();
+        }
+    });
+
+    callback(obj);
+}
+</script>
+
+</body>
+</html>
